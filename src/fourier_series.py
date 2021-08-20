@@ -21,30 +21,46 @@ class FourierSeries:
         self.signal = []
 
     def draw(self):
-        pygame.draw.circle(self.screen,
-                           self.settings.circle_color,
-                           self.settings.translate,
-                           self.settings.radius, 1)
+        x = 0
+        y = 0
 
-        x = self.settings.radius * math.cos(self.time)
-        y = self.settings.radius * math.sin(self.time)
+        for i in range(5):
+            # tracking x, y coordinates
+            prev_x = x
+            prev_y = y
+
+            n = i * 2 + 1
+            x += self.settings.radius * (4 / (n * math.pi)) * math.cos(n * self.time)
+            y += self.settings.radius * (4 / (n * math.pi)) * math.sin(n * self.time)
+
+            pygame.draw.circle(self.screen,
+                               self.settings.circle_color,
+                               self.settings.translate.__add__(Vector2(prev_x, prev_y)),
+                               self.settings.radius * (4 / (n * math.pi)), 1)
+
+            pygame.draw.line(self.screen, self.settings.line_color,
+                             self.settings.translate.__add__(Vector2(prev_x, prev_y)),
+                             self.settings.translate.__add__(Vector2(x, y)), 1)
+
+            # pygame.draw.circle(self.screen,
+            #                    self.settings.circle_color,
+            #                    self.settings.translate.__add__(Vector2(x, y)), 4)
+
         self.signal.insert(0, y)
-
-        pygame.draw.line(self.screen, self.settings.line_color,
-                         self.settings.translate, self.settings.translate.__add__(Vector2(x, y)), 1)
-        pygame.draw.circle(self.screen,
-                           self.settings.circle_color,
-                           self.settings.translate.__add__(Vector2(x, y)), 4)
 
         pygame.draw.line(self.screen, self.settings.line_color,
                          self.settings.translate.__add__(Vector2(x, y)),
                          self.settings.translate.__add__(Vector2(self.settings.translate.x, self.signal[0])))
 
         for i in range(len(self.signal)):
-            pygame.draw.circle(self.screen, self.settings.circle_color,
-                               self.settings.translate.__add__(Vector2(i/10 + self.settings.translate.x, self.signal[i])), 1)
+            pygame.draw.circle(self.screen, self.settings.line_color,
+                               self.settings.translate.__add__(Vector2(i/5+self.settings.translate.x, self.signal[i])),1)
 
-        self.time += 0.009
+            if i / 5 + self.settings.translate.x * 2 >= self.settings.screen_width:
+                # removing last value from list: time complexity O(1)
+                self.signal.pop()
+
+        self.time += 0.005
 
     def run(self):
         while 1:
@@ -52,13 +68,10 @@ class FourierSeries:
                 if event == pygame.QUIT:
                     pygame.quit()
 
-            if len(self.signal) > 1900:
-                self.signal.pop()
-
             self.screen.fill((0, 0, 0))
             self.draw()
+            pygame.time.wait(1)
             pygame.display.flip()
-            self.clock.tick(200)
 
 
 if __name__ == '__main__':
