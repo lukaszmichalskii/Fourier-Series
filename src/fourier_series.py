@@ -24,7 +24,7 @@ class FourierSeries:
         x = 0
         y = 0
 
-        for i in range(5):
+        for i in range(self.settings.n):
             # tracking x, y coordinates
             prev_x = x
             prev_y = y
@@ -68,7 +68,7 @@ class FourierSeries:
                 if event == pygame.QUIT:
                     pygame.quit()
 
-            self.screen.fill((0, 0, 0))
+            self.screen.fill(self.settings.bg_color)
             self.draw()
             pygame.time.wait(1)
             pygame.display.flip()
